@@ -1,25 +1,20 @@
 package com.asfusion.mate.events
 {
+	import flash.events.Event;
 	import flash.utils.getQualifiedClassName;
 	
 	/**
-	 * This event is used by the InjectorRegistry to register a target for Injection.
+	 * This event is used by the InjectorRegistry to remove a target frin Injection.
 	 */
-	public class InjectorEvent extends InjectorEventBase
-	{
-		//-----------------------------------------------------------------------------------------------------------
-		//                                          Public Constants
-		//------------------------------------------------------------------------------------------------------------
-		
-		public static const INJECT_DERIVATIVES:String = "injectDerivativesInjectorEvent";
-		
+	public class RemoveInjectorEvent extends InjectorEventBase
+	{	
 		//-----------------------------------------------------------------------------------------------------------
 		//                                          Constructor
 		//-------------------------------------------------------------------------------------------------------------
 		/**
 		 * Constructor
 		 */
-		public function InjectorEvent(type:String, target:Object, bubbles:Boolean=false, cancelable:Boolean=false)
+		public function RemoveInjectorEvent(type:String, target:Object, bubbles:Boolean=false, cancelable:Boolean=false)
 		{
 			var injectorTarget:Object = target;
 			if(target.hasOwnProperty("id"))
