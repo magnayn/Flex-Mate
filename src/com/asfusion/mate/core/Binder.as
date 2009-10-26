@@ -33,12 +33,25 @@ package com.asfusion.mate.core
 	 */
 	public class Binder
 	{
+		private var watcher:Object;
+		
 		protected var soft:Boolean;
 		public function Binder( soft:Boolean = false )
 		{
 			this.soft = soft;
 		}
 		
+		public function unbind():void
+		{
+			if( watcher is ChangeWatcher )
+			{
+				ChangeWatcher(watcher).unwatch();
+			}
+			else if( watcher is SoftChangeWatcher )
+			{
+				SoftChangeWatcher(watcher).unwatch();
+			}
+		}
 		
 		/**
 		 * The function that implements the binding between two objects.
@@ -61,11 +74,13 @@ package com.asfusion.mate.core
 					{
 						var softWacher:SoftChangeWatcher = bindProperty(target, targetKey, source, chainSourceKey);
 						if(softWacher.isWatching()) isWatching = true;
+						this.watcher = softWacher;
 					}
 					else
 					{
 						var wacher:ChangeWatcher = BindingUtils.bindProperty(target, targetKey, source, chainSourceKey);
 						if(wacher.isWatching()) isWatching = true;
+						this.watcher = wacher;
 					}
 				}
 				catch(error:ReferenceError)
