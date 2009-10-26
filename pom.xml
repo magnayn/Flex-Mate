@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<project>
+	<!-- Module -->
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.asfusion.mate</groupId>
+	<artifactId>mate</artifactId>
+	<version>0.8.9.nrm</version>
+	<packaging>swc</packaging>
+	<build>
+		<sourceDirectory>src</sourceDirectory>
+		<plugins>
+			<plugin>
+				<groupId>org.sonatype.flexmojos</groupId>
+				<artifactId>flexmojos-maven-plugin</artifactId>
+				<version>3.4.0</version>
+				<extensions>true</extensions>
+				<executions>
+					<execution>
+						<goals>
+							<goal>optimize</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<namespaces>
+						<namespace>
+							<uri>http://mate.asfusion.com/</uri>
+							<manifest>${basedir}/src/manifest.xml</manifest>
+						</namespace>
+					</namespaces>
+					<includeNamespaces>
+						<namespaces>http://mate.asfusion.com/</namespaces>
+					</includeNamespaces>
+				</configuration>
+				<dependencies>
+					<dependency>
+						<groupId>com.adobe.flex</groupId>
+						<artifactId>compiler</artifactId>
+						<version>3.3.0.4852</version>
+						<type>pom</type>
+					</dependency>
+				</dependencies>
+			</plugin>
+		</plugins>
+	</build>
+	<dependencies>
+		<!-- flex, standard -->
+		<dependency>
+			<groupId>com.adobe.flex.framework</groupId>
+			<artifactId>flex-framework</artifactId>
+			<version>3.3.0.4852</version>
+			<type>pom</type>
+		</dependency>
+	</dependencies>
+</project>
