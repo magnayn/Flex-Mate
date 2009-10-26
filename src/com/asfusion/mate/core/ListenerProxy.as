@@ -21,6 +21,7 @@ package com.asfusion.mate.core
 {
 	import com.asfusion.mate.events.InjectorEvent;
 	import com.asfusion.mate.events.InjectorSettingsEvent;
+	import com.asfusion.mate.events.RemoveInjectorEvent;
 	
 	import flash.display.DisplayObject;
 	import flash.display.Sprite;
@@ -28,6 +29,8 @@ package com.asfusion.mate.core
 	import flash.events.IEventDispatcher;
 	import flash.utils.Dictionary;
 	import flash.utils.getQualifiedClassName;
+	
+	import mx.events.FlexEvent;
 	
 	/**
 	 * The ListenerProxy is used by the injector (via MateManager)
@@ -116,6 +119,15 @@ package com.asfusion.mate.core
 			{
 				typeWatcher.addEventListener( InjectorSettingsEvent.TYPE_CHANGE, typeChangeHandler, false, 0, true );
 			}
+			
+			// And the remove event
+			weekDispatcher.addEventListener( FlexEvent.REMOVE, listenerProxyHandler, true, 1, true );
+			weekDispatcher.addEventListener( FlexEvent.REMOVE, listenerProxyHandler, false, 1, true );
+			
+			if( weekDispatcher is GlobalDispatcher )
+			{
+				GlobalDispatcher( weekDispatcher ).popupDispatcher.addEventListener( FlexEvent.REMOVE, globalListenerProxyHandler, true, 1, true );
+			}
 		}
 		
 		 //.........................................removeListener........................................
@@ -132,6 +144,14 @@ package com.asfusion.mate.core
 				GlobalDispatcher( weekDispatcher ).popupDispatcher.removeEventListener( type, globalListenerProxyHandler, true );
 			}
 			registered = false;
+			
+			// And the remove event
+			weekDispatcher.removeEventListener( FlexEvent.REMOVE, listenerProxyHandler, true  );
+			weekDispatcher.removeEventListener( FlexEvent.REMOVE, listenerProxyHandler, false );
+			if(weekDispatcher is GlobalDispatcher)
+			{
+				GlobalDispatcher( weekDispatcher ).popupDispatcher.removeEventListener( FlexEvent.REMOVE, globalListenerProxyHandler, true );
+			}
 		}
 		
 		 
@@ -146,13 +166,25 @@ package com.asfusion.mate.core
 		 */
 		protected function listenerProxyHandler(event:Event):void
 		{
-			var weekDispatcher:IEventDispatcher = dispatcher;
-			if( weekDispatcher.hasEventListener( getQualifiedClassName( event.target ) ) )
-			{
-				weekDispatcher.dispatchEvent( new InjectorEvent(null, event.target ) );
-			}
 			
-			weekDispatcher.dispatchEvent(new InjectorEvent( InjectorEvent.INJECT_DERIVATIVES, event.target ) );
+			var weekDispatcher:IEventDispatcher = dispatcher;
+			
+			if( event.type == FlexEvent.REMOVE )
+			{
+				if( weekDispatcher.hasEventListener( getQualifiedClassName( event.target ) ) )
+				{
+					weekDispatcher.dispatchEvent( new RemoveInjectorEvent(null, event.target ) );
+				}
+			}
+			else
+			{
+				if( weekDispatcher.hasEventListener( getQualifiedClassName( event.target ) ) )
+				{
+					weekDispatcher.dispatchEvent( new InjectorEvent(null, event.target ) );
+				}
+				
+				weekDispatcher.dispatchEvent(new InjectorEvent( InjectorEvent.INJECT_DERIVATIVES, event.target ) );
+			}
 		}
 		
 		//.........................................globalListenerProxyHandler......................................
@@ -162,17 +194,27 @@ package com.asfusion.mate.core
 		 */
 		protected function globalListenerProxyHandler(event:Event):void
 		{
+			
 			var weekDispatcher:IEventDispatcher = dispatcher;
 			var appDispatcher:Sprite = GlobalDispatcher( weekDispatcher ).applicationDispatcher as Sprite;
 			if(event.target is DisplayObject &&  appDispatcher.contains(event.target as DisplayObject ) ) return;
 			
-			if( weekDispatcher.hasEventListener( getQualifiedClassName( event.target ) ) )
+			if( event.type == FlexEvent.REMOVE )
 			{
-				weekDispatcher.dispatchEvent(new InjectorEvent( null, event.target ) );
+				if( weekDispatcher.hasEventListener( getQualifiedClassName( event.target ) ) )
+				{
+					weekDispatcher.dispatchEvent(new RemoveInjectorEvent( null, event.target ) );
+				}
 			}
-			
-			weekDispatcher.dispatchEvent( new InjectorEvent(InjectorEvent.INJECT_DERIVATIVES, event.target ) );
-			
+			else
+			{								
+				if( weekDispatcher.hasEventListener( getQualifiedClassName( event.target ) ) )
+				{
+					weekDispatcher.dispatchEvent(new InjectorEvent( null, event.target ) );
+				}
+				
+				weekDispatcher.dispatchEvent( new InjectorEvent(InjectorEvent.INJECT_DERIVATIVES, event.target ) );
+			}
 		}
 		
 		//.........................................typeChangeHandler........................................
