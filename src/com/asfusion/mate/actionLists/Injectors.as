@@ -2,6 +2,7 @@ package com.asfusion.mate.actionLists
 {
 	import com.asfusion.mate.core.*;
 	import com.asfusion.mate.events.InjectorEvent;
+	import com.asfusion.mate.events.InjectorEventBase;
 	import com.asfusion.mate.utils.debug.DebuggerUtil;
 	
 	import flash.events.IEventDispatcher;
@@ -189,8 +190,8 @@ package com.asfusion.mate.actionLists
 		 * Called by the dispacher when the event gets triggered.
 		 * This method creates a scope and then runs the sequence.
 		*/
-		protected function fireEvent(event:InjectorEvent):void
-		{
+		protected function fireEvent(event:InjectorEventBase):void
+		{			
 			var currentScope:Scope = new Scope(event, debug, map, inheritedScope);
 			currentScope.owner = this;
 			setScope(currentScope);
@@ -240,7 +241,7 @@ package com.asfusion.mate.actionLists
 		 * This function is a handler for the injection event, if the target it is a 
 		 * derivative class the injection gets triggered
 		 */ 
-		protected function injectDerivativesHandler( event:InjectorEvent ):void
+		protected function injectDerivativesHandler( event:InjectorEventBase ):void
 		{
 			if( isDerivative( event.injectorTarget, target  ) )
 			{

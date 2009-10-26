@@ -25,6 +25,10 @@ package com.asfusion.mate.actions
 	import com.asfusion.mate.core.Creator;
 	import com.asfusion.mate.core.ISmartObject;
 	import com.asfusion.mate.events.InjectorEvent;
+	import com.asfusion.mate.events.InjectorEventBase;
+	import com.asfusion.mate.events.RemoveInjectorEvent;
+	
+	import flash.utils.Dictionary;
 
 	/**
 	 * PropertyInjector sets a value from an object (source) to a destination (target). 
@@ -33,6 +37,8 @@ package com.asfusion.mate.actions
 	 */
 	public class PropertyInjector extends AbstractAction implements IAction
 	{
+		
+		private var binderHolder:Dictionary = new Dictionary(true );
 		
 		//-----------------------------------------------------------------------------------------------------------
 		//                                          Public Setters and Getters
@@ -169,9 +175,9 @@ package com.asfusion.mate.actions
 		 */
 		override protected function prepare(scope:IScope):void
 		{
-			if(!scope.event is InjectorEvent) return;
+			if(!scope.event is InjectorEventBase) return;
 			
-			var event:InjectorEvent = InjectorEvent(scope.event);
+			var event:InjectorEventBase = InjectorEventBase(scope.event);
 			if(targetId == null || targetId == event.uid)
 			{
 				if(source is Class)
@@ -195,14 +201,25 @@ package com.asfusion.mate.actions
 		 */
 		override protected function run(scope:IScope):void
 		{
-			if(!scope.event is InjectorEvent) return;
+			if(!scope.event is InjectorEventBase) return;
 			
-			var event:InjectorEvent = InjectorEvent(scope.event);
+			var event:InjectorEventBase = InjectorEventBase(scope.event);
 			if(targetId == null || targetId == event.uid)
 			{
-				var binder:Binder = new Binder( softBinding );
-				
-				binder.bind(scope, event.injectorTarget, targetKey, currentInstance, sourceKey);
+				if( scope.event is InjectorEvent )
+				{
+					var binder:Binder = new Binder( softBinding );
+					
+					binder.bind(scope, event.injectorTarget, targetKey, currentInstance, sourceKey);
+					
+					binderHolder["binder"] = binder;
+				}
+				else if( scope.event is RemoveInjectorEvent )
+				{
+					var binder:Binder = binderHolder["binder"] as Binder;
+					binder.unbind();
+					binderHolder["binder"] = null;
+				}
 			}
 		}
 	}
