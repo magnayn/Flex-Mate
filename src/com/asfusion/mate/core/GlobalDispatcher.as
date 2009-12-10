@@ -132,7 +132,7 @@ package com.asfusion.mate.core
 		 */
 		public function dispatchEvent(event:Event):Boolean
 		{
-			return applicationDispatcher.dispatchEvent(event);
+			return popupDispatcher.dispatchEvent(event);
 		}
 		
 		/*-.........................................hasEventListener..........................................*/
@@ -148,7 +148,7 @@ package com.asfusion.mate.core
 		 */
 		public function hasEventListener(type:String):Boolean
 		{
-			return applicationDispatcher.hasEventListener(type);
+			return popupDispatcher.hasEventListener(type);
 		}
 		
 		/*-.........................................willTrigger..........................................*/
@@ -164,7 +164,7 @@ package com.asfusion.mate.core
 		 */
 		public function willTrigger(type:String):Boolean
 		{
-			return applicationDispatcher.willTrigger(type);;
+			return popupDispatcher.willTrigger(type);;
 		}
 		
 		/*-.........................................interceptorEventHandler..........................................*/
