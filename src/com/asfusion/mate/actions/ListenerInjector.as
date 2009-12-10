@@ -23,8 +23,12 @@ package com.asfusion.mate.actions
 	import com.asfusion.mate.actionLists.IScope;
 	import com.asfusion.mate.core.ISmartObject;
 	import com.asfusion.mate.events.InjectorEvent;
-	import mx.core.EventPriority;
+	import com.asfusion.mate.events.RemoveInjectorEvent;
+	
 	import flash.events.IEventDispatcher;
+	
+	import mx.core.EventPriority;
+	import com.asfusion.mate.events.InjectorEventBase;
 	
 	/**
 	 * Registers an event listener object with an EventDispatcher object so that the listener receives notification of an event.
@@ -160,20 +164,45 @@ package com.asfusion.mate.actions
 		 */
 		override protected function run(scope:IScope):void
 		{
-			if(!scope.event is InjectorEvent) return;
+			if(!scope.event is InjectorEventBase) return;
 			
-			var event:InjectorEvent = InjectorEvent(scope.event);
-			if(eventType && (targetId == null || targetId == event.uid))
+			if( scope.event is InjectorEvent )
 			{
-				if(event.injectorTarget.hasOwnProperty(method) && event.injectorTarget[method] is Function)
+				var event:InjectorEvent = InjectorEvent(scope.event);
+				if(eventType && (targetId == null || targetId == event.uid))
 				{
-					var targetFunction:Function = event.injectorTarget[method];
-					var currentDispatcher:Object = (currentDispatcher is ISmartObject) ? ISmartObject(currentDispatcher).getValue(scope) : currentDispatcher;
-					if(!currentDispatcher) currentDispatcher = scope.dispatcher;
-					
-					if(currentDispatcher is IEventDispatcher)
+					if(event.injectorTarget.hasOwnProperty(method) && event.injectorTarget[method] is Function)
 					{
-						IEventDispatcher(currentDispatcher).addEventListener(eventType, targetFunction, useCapture, priority, useWeakReference);
+						var targetFunction:Function = event.injectorTarget[method];
+						var currentDispatcher:Object = (currentDispatcher is ISmartObject) ? ISmartObject(currentDispatcher).getValue(scope) : currentDispatcher;
+						if(!currentDispatcher) currentDispatcher = scope.dispatcher;
+						
+						if(currentDispatcher is IEventDispatcher)
+						{
+							IEventDispatcher(currentDispatcher).addEventListener(eventType, targetFunction, useCapture, priority, useWeakReference);
+						}
+					}
+				}
+			}
+			else if( scope.event is RemoveInjectorEvent )
+			{
+				// The default for a listenerInjector is to apply a weak reference, so there will not be a memory leak for dialogs
+				// hanging around. However, they may still get events after they have closed but before the Garbage Collector
+				// has had a chance to reap it, so we may as well respond to the removal event and remove the listener anyway.
+				
+				var removeEvent:RemoveInjectorEvent = RemoveInjectorEvent(scope.event);
+				if(eventType && (targetId == null || targetId == removeEvent.uid))
+				{
+					if(removeEvent.injectorTarget.hasOwnProperty(method) && removeEvent.injectorTarget[method] is Function)
+					{
+						var targetFunction:Function = removeEvent.injectorTarget[method];
+						var currentDispatcher:Object = (currentDispatcher is ISmartObject) ? ISmartObject(currentDispatcher).getValue(scope) : currentDispatcher;
+						if(!currentDispatcher) currentDispatcher = scope.dispatcher;
+						
+						if(currentDispatcher is IEventDispatcher)
+						{
+							IEventDispatcher(currentDispatcher).removeEventListener(eventType,targetFunction,useCapture);
+						}
 					}
 				}
 			}
