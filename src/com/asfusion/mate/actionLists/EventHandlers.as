@@ -22,6 +22,7 @@ package com.asfusion.mate.actionLists
 	import com.asfusion.mate.core.*;
 	import com.asfusion.mate.events.DispatcherEvent;
 	import com.asfusion.mate.utils.debug.DebuggerUtil;
+	import com.asfusion.mate.events.EventFilter;
 	
 	import flash.events.Event;
 	import flash.events.IEventDispatcher;
@@ -44,6 +45,7 @@ package com.asfusion.mate.actionLists
 	public class EventHandlers extends AbstractHandlers
 	{
 		
+		private static var eventFilter:EventFilter = new EventFilter();
 		/**
 		 * Flag indicating if this <code>EventHandlers</code> tag is registered to listen to an event or not.
 		 */
@@ -251,10 +253,13 @@ package com.asfusion.mate.actionLists
 		*/
 		protected function fireEvent(event:Event):void
 		{
-			var currentScope:Scope = new Scope(event, debug, map,inheritedScope);
-			currentScope.owner = this;
-			setScope(currentScope);
-			runSequence(currentScope, actions);
+			if( eventFilter.isRequiredEvent(map, event) )
+			{
+				var currentScope:Scope = new Scope(event, debug, map,inheritedScope);
+				currentScope.owner = this;
+				setScope(currentScope);
+				runSequence(currentScope, actions);
+			}
 		}
 	}
 }
