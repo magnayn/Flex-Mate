@@ -23,6 +23,16 @@ package com.asfusion.mate.utils
 			return popup;
 	    }
 	    
+	    public static function addPopUp(window:IFlexDisplayObject,
+                    parent:DisplayObject,
+                    modal:Boolean = false,
+                    childList:String = null):void
+		{
+			PopUpManager.addPopUp(window, parent, modal, childList);
+			
+			creationMap[window] = parent;
+		}
+	    
 	    public static function getMapping(popup:IFlexDisplayObject):DisplayObject
 	    {
 	    	return creationMap[popup];
