@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.asfusion.mate</groupId>
 	<artifactId>mate</artifactId>
-	<version>0.8.9.nrm</version>
+	<version>0.8.9.1.nrm-SNAPSHOT</version>
 	<packaging>swc</packaging>
 	<build>
 		<sourceDirectory>src</sourceDirectory>
