@@ -16,11 +16,7 @@ package com.asfusion.mate.events
 		 */
 		public function RemoveInjectorEvent(type:String, target:Object, bubbles:Boolean=false, cancelable:Boolean=false)
 		{
-			var injectorTarget:Object = target;
-			if(target.hasOwnProperty("id"))
-			{
-				uid = target["id"];
-			}
+			var injectorTarget:Object = target;			
 			
 			if( !type ) 
 			{
@@ -28,6 +24,11 @@ package com.asfusion.mate.events
 			}
 				
 			super(type, injectorTarget, bubbles, cancelable);
+			
+			if(target.hasOwnProperty("id"))
+			{
+				uid = target["id"];
+			}
 		}
 		
 	}
