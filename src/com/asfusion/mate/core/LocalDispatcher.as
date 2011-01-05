@@ -23,6 +23,7 @@ package com.asfusion.mate.core
 	import flash.events.Event;
 	import flash.events.EventPhase;
 	import flash.events.IEventDispatcher;
+	import flash.utils.Dictionary;
 	
 	import mx.core.UIComponent;
 
@@ -76,15 +77,50 @@ package com.asfusion.mate.core
 			if(type != "applicationComplete")
 			{
 				if(!useCapture)
+				{		
+					trace("Add popupDispathcerListener " + type + "; " + componentDispatcher );
+					
+					if( listenersArray[type] == null )
+						listenersArray[type] = new Dictionary(true);
+					
+					(listenersArray[type] as Dictionary)[ listener ] = listener;
+					
+					popupDispatcher.addEventListener(type, filteredEventHandler, false, priority);					
+				}
+//				if(!useCapture)
+//				{
+//					// We register also the same listener function in the popupDispatcher. 
+//					// The popupDispatcher is systemManager itself and has the applicationDispatcher as one of its children. 
+//					// Because we don't want to fire the listener twice, we have an extra listener that will stop the event 
+//					// if the event was already handled in the applicationDispatcher.
+//					popupDispatcher.addEventListener(type, interceptorEventHandler, useCapture, -100, useWeakReference);
+//					popupDispatcher.addEventListener(type, listener, useCapture, -101, useWeakReference);
+//				}
+			}
+		}
+		
+		private var listenersArray:Object = new Object();
+		
+		protected function filteredEventHandler(event:Event):void
+		{			
+			if( !eventHasAlreadyBeenSeen(event) )
+			{
+				for each(var listener:Function in getListenersForEvent(event) )
 				{
-					// We register also the same listener function in the popupDispatcher. 
-					// The popupDispatcher is systemManager itself and has the applicationDispatcher as one of its children. 
-					// Because we don't want to fire the listener twice, we have an extra listener that will stop the event 
-					// if the event was already handled in the applicationDispatcher.
-					popupDispatcher.addEventListener(type, interceptorEventHandler, useCapture, -100, useWeakReference);
-					popupDispatcher.addEventListener(type, listener, useCapture, -101, useWeakReference);
+					listener(event);
 				}
 			}
+			else
+			{
+				trace("reject " + event);
+			}
+		
+		}
+		
+		protected function getListenersForEvent(event:Event):Dictionary
+		{
+			var dict:Dictionary = listenersArray[event.type] as Dictionary;
+			return dict;	
 		}
 		
 		/*-.........................................removeEventListener..........................................*/
@@ -158,10 +194,34 @@ package com.asfusion.mate.core
 				{
 					if(event.eventPhase == EventPhase.BUBBLING_PHASE)
 					{
+						trace("kill " + event);
 						event.stopImmediatePropagation();
 					}
 				}
 			}
+			
+			trace("nokill " + event);
+		}
+		
+		protected function eventHasAlreadyBeenSeen(event:Event):Boolean
+		{
+			var target:DisplayObject = (event.target is DisplayObject) ? event.target as DisplayObject : null;
+			
+			trace("Already seen? " + target + " " + event);
+			
+			if(target)
+			{
+				var isApplicationChild:Boolean = (componentDispatcher as Sprite).contains(target);
+				if(event.target == componentDispatcher || isApplicationChild || target.parent == null)
+				{
+					if(event.eventPhase == EventPhase.BUBBLING_PHASE)
+					{
+						return true;
+					}
+				}
+			}	
+			
+			return false;
 		}
 	}
 }

@@ -264,6 +264,11 @@ package com.asfusion.mate.core
 			return _dispatcher;
 		}
 		
+		public function get defaultPriority():int
+		{
+			return 0;
+		}
+		
 		/*-----------------------------------------------------------------------------------------------------------
 		*                                      Implementation of IMXMLObject interface
 		-------------------------------------------------------------------------------------------------------------*/

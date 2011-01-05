@@ -26,11 +26,15 @@ package com.asfusion.mate.core
 	
 	public class LocalEventMap extends EventMap
 	{	
+		public var useDualDispatcher:Boolean = true;
+		
 		//.........................................Contructor..........................................
 		public function LocalEventMap()
 		{
 			_cache = Cache.LOCAL;
 		}
+		
+		
 		
 		//.........................................dispatcher..........................................
 		private var _dispatcher:IEventDispatcher;
@@ -43,14 +47,34 @@ package com.asfusion.mate.core
 		}
 		public function set dispatcher(value:IEventDispatcher):void
 		{
-			var oldValue:IEventDispatcher = _dispatcher;
-			if(oldValue !== value)
+			var oldValue:IEventDispatcher = dispatcher;
+			
+			if( useDualDispatcher )
 			{
-				_dispatcher = value;
-				var event:DispatcherEvent = new DispatcherEvent(DispatcherEvent.CHANGE);
-				event.newDispatcher = value;
-				event.oldDispatcher = oldValue;
-				dispatchEvent(event);
+				var unwrappedOldValue:IEventDispatcher = null;
+				if( oldValue != null )
+					unwrappedOldValue = LocalDispatcher(oldValue).componentDispatcher;
+				
+				if( unwrappedOldValue != value )
+				{
+					_dispatcher = new LocalDispatcher(value);
+					var event:DispatcherEvent = new DispatcherEvent(DispatcherEvent.CHANGE);
+					event.newDispatcher = _dispatcher;
+					event.oldDispatcher = oldValue;
+					dispatchEvent(event);
+				}
+			}
+			else
+			{
+			
+				if(oldValue !== value)
+				{				
+					_dispatcher = value;
+					var event:DispatcherEvent = new DispatcherEvent(DispatcherEvent.CHANGE);
+					event.newDispatcher = _dispatcher;
+					event.oldDispatcher = oldValue;
+					dispatchEvent(event);
+				}
 			}
 		}
 		//.........................................getDispatcher..........................................

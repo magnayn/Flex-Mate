@@ -4,8 +4,31 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.asfusion.mate</groupId>
 	<artifactId>mate</artifactId>
-	<version>0.8.9.1.nrm-SNAPSHOT</version>
+	<version>0.8.9.2.nrm-SNAPSHOT</version>
 	<packaging>swc</packaging>
+	
+	<properties>	    
+	    <repo-web-root>http://nexus.internal.realtimehealth.net:8081/nexus/content/repositories</repo-web-root>
+	</properties>
+	
+	<distributionManagement>
+	    <site>
+	      <id>website</id>
+	      <url>dav:http://team.cswgroup.local/maven2/site/mate</url>
+	    </site>
+	    <repository>
+	      <id>release</id>
+	      <name>Central Repository</name>
+	      <url>${repo-web-root}/releases</url>
+	    </repository>
+	    <snapshotRepository>
+	      <id>snapshot</id>
+	      <name>Central Development Repository</name>
+	      <url>${repo-web-root}/snapshots</url>
+	    </snapshotRepository>
+	  </distributionManagement>
+	
+	
 	<build>
 		<sourceDirectory>src</sourceDirectory>
 		<plugins>

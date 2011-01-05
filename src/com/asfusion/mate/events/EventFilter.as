@@ -12,6 +12,12 @@ package com.asfusion.mate.events
 	import mx.core.IFlexDisplayObject;
 	import mx.managers.SystemManager;
 	
+	/**
+	 * All Local Event maps will receive events that originate from Dialog boxes.
+	 * However, we only want to look at events that have "come from" events that were
+	 * created by the view that a particular map is for. We look at the dialog 'real' parent
+	 * (Registered through the MatePopupManager) and natural parent-child relationships
+	 */ 
 	public class EventFilter
 	{
 		public function isRequiredEvent(map:IEventMap, event:Event):Boolean
@@ -32,29 +38,30 @@ package com.asfusion.mate.events
 						return false;
 					
 					var mapParent:IFlexDisplayObject = getMapParent(map);
-						
-					// OK - try to find an event map
-					while(realParent != null)
-					{						
-						if( mapParent == realParent )
-							return true;
-						
-						realParent = realParent.parent;
-					}
-					
-					// No, our map wasn't in this list. So we are not interested.
-					return false;
+											
+					return findMatchingParent(mapParent, realParent);
 				}
 			}
 			
 			return true;
 		}  
+		
+		private function findMatchingParent(mapParent:IFlexDisplayObject, realParent:DisplayObject):Boolean
+		{
+			if( mapParent == null || realParent == null)
+				return false;
+			
+			if( mapParent == realParent )
+				return true;
+		
+			return findMatchingParent(mapParent, realParent.parent) || findMatchingParent(mapParent, MatePopUpManager.getMapping(realParent as IFlexDisplayObject));						
+		}
 
 		private function getMapParent(map:IEventMap):IFlexDisplayObject
 		{
 			var disp:IEventDispatcher = map.getDispatcher();
 			
-			if( disp instanceof LocalDispatcher )
+			if( disp is LocalDispatcher )
 			{
 				return IFlexDisplayObject((disp as LocalDispatcher).componentDispatcher);
 			}

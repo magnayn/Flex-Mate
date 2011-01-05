@@ -185,6 +185,7 @@ package com.asfusion.mate.core
 				{
 					if(event.eventPhase == EventPhase.BUBBLING_PHASE)
 					{
+						trace("GLOBAL KILL " + event);
 						event.stopImmediatePropagation();
 					}
 				}

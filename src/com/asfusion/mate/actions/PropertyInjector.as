@@ -217,8 +217,11 @@ package com.asfusion.mate.actions
 				else if( scope.event is RemoveInjectorEvent )
 				{
 					var binder:Binder = binderHolder["binder"] as Binder;
-					binder.unbind();
-					binderHolder["binder"] = null;
+					if( binder != null )
+					{						
+						binder.unbind();
+						binderHolder["binder"] = null;
+					}
 				}
 			}
 		}
